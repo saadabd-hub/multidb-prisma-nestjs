@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/@prisma/client/db_pt"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_PT_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model t_jurusan {
+  c_id_jurusan            Int                  @id @default(autoincrement())
+  c_id_perguruan_tinggi   Int?
+  c_nama_jurusan          String?              @db.VarChar(100)
+  c_kode_kelompok_jurusan String?              @db.VarChar(12)
+  c_kode_rumpun_jurusan   String?              @db.VarChar(12)
+  c_keterangan            Json                 @db.Json
+  c_status                String?              @db.VarChar(255)
+  c_pg                    Float?
+  c_pgum                  Float?
+  c_plum                  Float?
+  c_lintas_jurusan        String?              @db.VarChar(255)
+  c_is_sbmptn             Int                  @default(0) @db.SmallInt
+  c_is_um                 Int                  @default(0) @db.SmallInt
+  c_jenjang               String?              @db.Char(4)
+  c_is_snmptn             Int                  @default(0) @db.SmallInt
+  c_updater               String?              @db.VarChar(20)
+  c_created_at            DateTime             @default(now()) @db.Timestamp(6)
+  c_last_update           DateTime             @default(now()) @db.Timestamp(6)
+  t_perguruan_tinggi      t_perguruan_tinggi?  @relation(fields: [c_id_perguruan_tinggi], references: [c_id_perguruan_tinggi], onDelete: Cascade)
+  t_kelompok_jurusan      t_kelompok_jurusan?  @relation(fields: [c_kode_kelompok_jurusan], references: [c_kode_kelompok_jurusan], onDelete: Cascade)
+  t_rumpun_jurusan        t_rumpun_jurusan?    @relation(fields: [c_kode_rumpun_jurusan], references: [c_kode_rumpun_jurusan], onDelete: Cascade)
+  t_jurusan_deskripsi     t_jurusan_deskripsi?
+
+  @@index([c_id_perguruan_tinggi])
+  @@index([c_kode_kelompok_jurusan])
+  @@index([c_kode_rumpun_jurusan])
+}
+
+model t_jurusan_deskripsi {
+  c_id_jurusan     Int       @id
+  c_deskripsi      String?
+  c_lapangan_kerja String?
+  t_jurusan        t_jurusan @relation(fields: [c_id_jurusan], references: [c_id_jurusan], onDelete: Cascade)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model t_kelompok_jurusan {
+  c_kode_kelompok_jurusan String      @id @db.VarChar(12)
+  c_deskripsi             String?     @db.VarChar(50)
+  c_upline                String      @db.VarChar(12)
+  c_keterangan            Json?       @db.Json
+  c_status                String?     @db.VarChar(255)
+  c_updater               String?     @db.VarChar(20)
+  c_created_at            DateTime    @default(now()) @db.Timestamp(6)
+  c_last_update           DateTime    @default(now()) @db.Timestamp(6)
+  t_jurusan               t_jurusan[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model t_perguruan_tinggi {
+  c_id_perguruan_tinggi   Int         @id @default(autoincrement())
+  c_id_district           Int?
+  c_nama_perguruan_tinggi String      @db.VarChar(250)
+  c_akronim               String?     @db.VarChar(50)
+  c_jenis                 String      @db.VarChar(255)
+  c_is_internasional      String      @default("N") @db.Char(1)
+  c_status                String?     @default("Aktif") @db.VarChar(255)
+  c_updater               String?     @db.VarChar(20)
+  c_created_at            DateTime    @default(now()) @db.Timestamp(6)
+  c_last_update           DateTime    @default(now()) @db.Timestamp(6)
+  t_jurusan               t_jurusan[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model t_rumpun_jurusan {
+  c_kode_rumpun_jurusan String      @id @db.VarChar(12)
+  c_deskripsi           String?     @db.VarChar(50)
+  c_upline              String      @db.VarChar(12)
+  c_keterangan          Json?       @db.Json
+  c_status              String?     @db.VarChar(255)
+  c_updater             String?     @db.VarChar(20)
+  c_created_at          DateTime    @default(now()) @db.Timestamp(6)
+  c_last_update         DateTime    @default(now()) @db.Timestamp(6)
+  t_jurusan             t_jurusan[]
+}
